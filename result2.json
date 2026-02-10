@@ -1,0 +1,232 @@
+{
+  "timestamp": "2026-02-10T14:16:53.042418",
+  "configuration": {
+    "tools_tested": [
+      "LangSmith",
+      "Langfuse",
+      "Braintrust"
+    ],
+    "questions": [
+      "My last invoice shows a charge of $299 but I was expecting $199. Can you help me understand this discrepancy?",
+      "I need technical support for setting up my new device. Can you guide me through the process?",
+      "What are your business hours and how can I contact customer support?",
+      "I want to upgrade my plan. What options do I have and what are the costs?"
+    ],
+    "num_runs": 1
+  },
+  "results": {
+    "LangSmith": [
+      {
+        "output": "The discrepancy in your invoice is due to a $100 one-time setup fee that was applied this month, resulting in a total charge of $299. Your standard plan is $199/month, and future invoices will return to that amount without the additional fee.",
+        "latency_ms": 2288.8400554656982,
+        "tools_used": [
+          "get_billing_info"
+        ],
+        "intermediate_steps": 1,
+        "metadata": {
+          "tracing": "automatic",
+          "setup_complexity": "low"
+        },
+        "total_time": 2288.8550758361816,
+        "run_number": 1,
+        "question_index": 0,
+        "question": "My last invoice shows a charge of $299 but I was expecting $199. Can you help me understand this discrepancy?"
+      },
+      {
+        "output": "To set up your new device, please follow these steps:\n\n1. **Restart Your Device**: Make sure to power off your device and then turn it back on.\n2. **Check Connections**: Ensure that all cables and connections are secure and properly plugged in.\n\nIf you need more specific guidance or have any particular issues, feel free to ask!",
+        "latency_ms": 2358.1137657165527,
+        "tools_used": [
+          "get_technical_support"
+        ],
+        "intermediate_steps": 1,
+        "metadata": {
+          "tracing": "automatic",
+          "setup_complexity": "low"
+        },
+        "total_time": 2358.1387996673584,
+        "run_number": 1,
+        "question_index": 1,
+        "question": "I need technical support for setting up my new device. Can you guide me through the process?"
+      },
+      {
+        "output": "Our business hours are 9 AM - 5 PM EST, Monday through Friday. \n\nTo contact customer support, you can reach out during these hours. If you need immediate assistance, please restart your device and check your connections.",
+        "latency_ms": 3890.9950256347656,
+        "tools_used": [
+          "get_general_info",
+          "get_technical_support"
+        ],
+        "intermediate_steps": 2,
+        "metadata": {
+          "tracing": "automatic",
+          "setup_complexity": "low"
+        },
+        "total_time": 3891.0200595855713,
+        "run_number": 1,
+        "question_index": 2,
+        "question": "What are your business hours and how can I contact customer support?"
+      },
+      {
+        "output": "You have the following options for upgrading your plan:\n\n1. **Standard Plan**: $199/month\n2. **Upgraded Plan**: $299 (includes a one-time setup fee of $100 this month, and future invoices will be $199/month)\n\nIf you choose the upgraded plan, your first invoice will be $299, and subsequent invoices will revert to $199/month.",
+        "latency_ms": 2463.960647583008,
+        "tools_used": [
+          "get_billing_info"
+        ],
+        "intermediate_steps": 1,
+        "metadata": {
+          "tracing": "automatic",
+          "setup_complexity": "low"
+        },
+        "total_time": 2463.979959487915,
+        "run_number": 1,
+        "question_index": 3,
+        "question": "I want to upgrade my plan. What options do I have and what are the costs?"
+      }
+    ],
+    "Langfuse": [
+      {
+        "output": "The discrepancy in your invoice charge is due to a $100 one-time setup fee that was applied this month, resulting in a total charge of $299. Your standard plan is $199/month, and future invoices will return to the regular amount of $199.",
+        "latency_ms": 2337.049961090088,
+        "tools_used": [
+          "get_billing_info"
+        ],
+        "intermediate_steps": 1,
+        "trace_id": "auto-traced",
+        "metadata": {
+          "tracing": "callback-based",
+          "setup_complexity": "medium",
+          "sdk_version": "v3",
+          "note": "Traces sent automatically, check Langfuse UI"
+        },
+        "total_time": 2337.066888809204,
+        "run_number": 1,
+        "question_index": 0,
+        "question": "My last invoice shows a charge of $299 but I was expecting $199. Can you help me understand this discrepancy?"
+      },
+      {
+        "output": "To set up your new device, please follow these steps:\n\n1. **Restart Your Device**: Make sure to power off your device completely and then turn it back on.\n\n2. **Check Connections**: Ensure that all cables and connections are secure. This includes power cables, HDMI cables, or any other necessary connections depending on the type of device.\n\nIf you need more specific guidance or have a particular type of device in mind, please let me know!",
+        "latency_ms": 2458.829641342163,
+        "tools_used": [
+          "get_technical_support"
+        ],
+        "intermediate_steps": 1,
+        "trace_id": "auto-traced",
+        "metadata": {
+          "tracing": "callback-based",
+          "setup_complexity": "medium",
+          "sdk_version": "v3",
+          "note": "Traces sent automatically, check Langfuse UI"
+        },
+        "total_time": 2458.846092224121,
+        "run_number": 1,
+        "question_index": 1,
+        "question": "I need technical support for setting up my new device. Can you guide me through the process?"
+      },
+      {
+        "output": "Our business hours are from 9 AM to 5 PM EST, Monday through Friday. \n\nFor customer support, please restart your device and check your connections. If you need further assistance, you can reach out to us during our business hours.",
+        "latency_ms": 2872.7922439575195,
+        "tools_used": [
+          "get_general_info",
+          "get_technical_support"
+        ],
+        "intermediate_steps": 1,
+        "trace_id": "auto-traced",
+        "metadata": {
+          "tracing": "callback-based",
+          "setup_complexity": "medium",
+          "sdk_version": "v3",
+          "note": "Traces sent automatically, check Langfuse UI"
+        },
+        "total_time": 2872.818946838379,
+        "run_number": 1,
+        "question_index": 2,
+        "question": "What are your business hours and how can I contact customer support?"
+      },
+      {
+        "output": "You have the following options for upgrading your plan:\n\n1. **Standard Plan**: $199/month\n2. **Upgraded Plan**: $299 (includes a one-time setup fee of $100 this month, with future invoices at $199/month)\n\nIf you choose the upgraded plan, your first invoice will reflect the setup fee, but subsequent invoices will revert to the standard rate of $199/month.",
+        "latency_ms": 2864.0267848968506,
+        "tools_used": [
+          "get_billing_info"
+        ],
+        "intermediate_steps": 1,
+        "trace_id": "auto-traced",
+        "metadata": {
+          "tracing": "callback-based",
+          "setup_complexity": "medium",
+          "sdk_version": "v3",
+          "note": "Traces sent automatically, check Langfuse UI"
+        },
+        "total_time": 2864.053249359131,
+        "run_number": 1,
+        "question_index": 3,
+        "question": "I want to upgrade my plan. What options do I have and what are the costs?"
+      }
+    ],
+    "Braintrust": [
+      {
+        "output": "The discrepancy in your invoice charge is due to a $100 one-time setup fee that was applied this month, resulting in a total charge of $299. Your standard plan is $199/month, and future invoices will return to the regular amount of $199.",
+        "latency_ms": 2231.5421104431152,
+        "tools_used": [
+          "get_billing_info"
+        ],
+        "intermediate_steps": 1,
+        "metadata": {
+          "tracing": "manual",
+          "setup_complexity": "high"
+        },
+        "total_time": 2496.206045150757,
+        "run_number": 1,
+        "question_index": 0,
+        "question": "My last invoice shows a charge of $299 but I was expecting $199. Can you help me understand this discrepancy?"
+      },
+      {
+        "output": "To set up your new device, please follow these steps:\n\n1. **Restart Your Device**: Make sure to power on your device and restart it if it's already on.\n2. **Check Connections**: Ensure that all necessary connections (like power, internet, etc.) are properly made.\n\nIf you need more specific guidance or have a particular type of device in mind, please let me know!",
+        "latency_ms": 3125.718116760254,
+        "tools_used": [
+          "get_technical_support"
+        ],
+        "intermediate_steps": 1,
+        "metadata": {
+          "tracing": "manual",
+          "setup_complexity": "high"
+        },
+        "total_time": 3525.038003921509,
+        "run_number": 1,
+        "question_index": 1,
+        "question": "I need technical support for setting up my new device. Can you guide me through the process?"
+      },
+      {
+        "output": "Our business hours are from 9 AM to 5 PM EST, Monday through Friday. \n\nFor customer support, please restart your device and check your connections. If you need further assistance, you can reach out during our business hours.",
+        "latency_ms": 3076.1122703552246,
+        "tools_used": [
+          "get_general_info",
+          "get_technical_support"
+        ],
+        "intermediate_steps": 1,
+        "metadata": {
+          "tracing": "manual",
+          "setup_complexity": "high"
+        },
+        "total_time": 3897.0727920532227,
+        "run_number": 1,
+        "question_index": 2,
+        "question": "What are your business hours and how can I contact customer support?"
+      },
+      {
+        "output": "You have the following options for upgrading your plan:\n\n1. **Standard Plan**: $199/month\n2. **Upgraded Plan**: $299 (includes a one-time setup fee of $100 this month, and future invoices will be $199/month)\n\nIf you choose the upgraded plan, your first invoice will be $299, and subsequent invoices will revert to $199/month.",
+        "latency_ms": 3057.382106781006,
+        "tools_used": [
+          "get_billing_info"
+        ],
+        "intermediate_steps": 1,
+        "metadata": {
+          "tracing": "manual",
+          "setup_complexity": "high"
+        },
+        "total_time": 3480.3709983825684,
+        "run_number": 1,
+        "question_index": 3,
+        "question": "I want to upgrade my plan. What options do I have and what are the costs?"
+      }
+    ]
+  }
+}
