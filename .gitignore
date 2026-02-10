@@ -1,0 +1,4 @@
+LLM_AGENT/
+.env
+__pycache__
+agents/__pycache__
