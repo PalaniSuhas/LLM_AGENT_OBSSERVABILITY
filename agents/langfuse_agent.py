@@ -45,23 +45,15 @@ class LangfuseAgent:
         self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=self.api_key)
         self.llm_with_tools = self.llm.bind_tools(self.tools)
         
-        # Initialize Langfuse with host configuration
-        langfuse_host = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
-        self.langfuse = Langfuse(host=langfuse_host)
+        # Initialize Langfuse client
+        self.langfuse = Langfuse()
     
     def run(self, question: str, session_id: str = "benchmark-session") -> Dict[str, Any]:
         """Run the agent with Langfuse tracing."""
         start_time = time.time()
         
-        # Get host from environment
-        langfuse_host = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
-        
-        handler = CallbackHandler(
-            session_id=session_id,
-            user_id="benchmark-user",
-            metadata={"environment": "benchmark", "version": "1.0"},
-            host=langfuse_host
-        )
+        # Minimal CallbackHandler - no parameters, no methods
+        handler = CallbackHandler()
         
         # Simple agentic loop
         messages = [{"role": "user", "content": question}]
@@ -113,18 +105,22 @@ class LangfuseAgent:
         
         latency = (time.time() - start_time) * 1000
         
-        handler.flush()
+        # Langfuse SDK v3: CallbackHandler has no methods
+        # - No flush() method
+        # - No get_trace_id() method
+        # Traces are sent automatically
         
         return {
             "output": final_output,
             "latency_ms": latency,
             "tools_used": list(set(tools_used)),
             "intermediate_steps": intermediate_steps,
-            "trace_id": handler.get_trace_id(),
+            "trace_id": "auto-traced",  # v3 doesn't expose trace ID from handler
             "metadata": {
                 "tracing": "callback-based",
                 "setup_complexity": "medium",
-                "langfuse_host": langfuse_host
+                "sdk_version": "v3",
+                "note": "Traces sent automatically, check Langfuse UI"
             }
         }
     
