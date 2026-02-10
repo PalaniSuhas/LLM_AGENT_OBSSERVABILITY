@@ -37,19 +37,28 @@ def get_general_info(query: str) -> str:
 
 class LangSmithAgent:
     def __init__(self):
+        # 1. Ensure keys are loaded
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        if not self.api_key:
+            raise ValueError("OPENAI_API_KEY not found in environment variables")
+
         self.tools = [get_billing_info, get_technical_support, get_general_info]
         
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are a helpful customer service agent. 
-            Classify the user's intent as Billing, Technical, or General.
-            Use the appropriate tool to get information, then provide a helpful response."""),
+            ("system", "You are a helpful customer service agent."),
             ("human", "{input}"),
             ("placeholder", "{agent_scratchpad}"),
         ])
         
-        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        # 2. Specify the model explicitly
+        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=self.api_key)
+        
+        # 3. Create the agent
         agent = create_openai_tools_agent(self.llm, self.tools, self.prompt)
         
+        if agent is None:
+            raise ValueError("Failed to create LangChain agent. Check prompt and tool definitions.")
+
         self.agent_executor = AgentExecutor(
             agent=agent,
             tools=self.tools,
