@@ -2,7 +2,8 @@ import os
 import time
 from typing import Dict, Any, List
 from langchain_openai import ChatOpenAI
-from langchain.agents.agent import AgentExecutor, create_openai_tools_agent
+from langchain.agents.agent import AgentExecutor
+from langchain.agents import create_openai_tools_agent
 from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate
 from langfuse.callback import CallbackHandler
