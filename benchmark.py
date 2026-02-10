@@ -20,7 +20,7 @@ STANDARD_QUESTION = (
     "Can you help me understand this discrepancy?"
 )
 
-st.title("🔍 LLM Agent Observability Tools Benchmark")
+st.title("LLM Agent Observability Tools Benchmark")
 st.markdown("**Compare LangSmith, Langfuse, and Braintrust side-by-side**")
 
 st.divider()
@@ -28,7 +28,7 @@ st.divider()
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.subheader("📝 Standard Test Question")
+    st.subheader("Standard Test Question")
     question = st.text_area(
         "Question to test all agents:",
         value=STANDARD_QUESTION,
@@ -37,7 +37,7 @@ with col1:
     )
 
 with col2:
-    st.subheader("⚙️ Configuration")
+    st.subheader("Configuration")
     
     tools_to_test = st.multiselect(
         "Select tools to benchmark:",
@@ -55,7 +55,7 @@ with col2:
 
 st.divider()
 
-if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
+if st.button("Run Benchmark", type="primary"):
     
     results = {
         "LangSmith": [],
@@ -96,23 +96,23 @@ if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
                 
                 time.sleep(0.5)
             
-            st.success(f"✅ {tool_name} completed {num_runs} run(s)")
+            st.success(f"{tool_name} completed {num_runs} run(s)")
             
         except Exception as e:
-            st.error(f"❌ {tool_name} failed: {str(e)}")
+            st.error(f"{tool_name} failed: {str(e)}")
             results[tool_name].append({"error": str(e)})
     
     progress_bar.empty()
     status_text.empty()
     
     st.divider()
-    st.header("📊 Benchmark Results")
+    st.header("Benchmark Results")
     
     tab1, tab2, tab3, tab4 = st.tabs([
-        "📈 Performance Metrics",
-        "🔧 Tool Comparison",
-        "📝 Detailed Results",
-        "🏆 Final Verdict"
+        "Performance Metrics",
+        "Tool Comparison",
+        "Detailed Results",
+        "Final Verdict"
     ])
     
     with tab1:
@@ -177,34 +177,34 @@ if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
                 "Production Ready"
             ],
             "LangSmith": [
-                "✅ Native",
-                "🟢 Low (env var)",
-                "✅ Yes",
-                "✅ Automatic",
-                "✅ Automatic",
-                "❌ No",
-                "✅ Built-in",
-                "✅ Yes"
+                "Native",
+                "Low (env var)",
+                "Yes",
+                "Automatic",
+                "Automatic",
+                "No",
+                "Built-in",
+                "Yes"
             ],
             "Langfuse": [
-                "⚠️ Callback",
-                "🟡 Medium",
-                "⚠️ Via callback",
-                "✅ Automatic",
-                "✅ Automatic",
-                "✅ Yes (OSS)",
-                "⚠️ Manual scoring",
-                "✅ Yes"
+                "Callback",
+                "Medium",
+                "Via callback",
+                "Automatic",
+                "Automatic",
+                "Yes (OSS)",
+                "Manual scoring",
+                "Yes"
             ],
             "Braintrust": [
-                "❌ Manual",
-                "🔴 High",
-                "❌ No",
-                "⚠️ Manual",
-                "⚠️ Manual",
-                "❌ No",
-                "✅ Built-in",
-                "⚠️ Limited"
+                "Manual",
+                "High",
+                "No",
+                "Manual",
+                "Manual",
+                "No",
+                "Built-in",
+                "Limited"
             ]
         }
         
@@ -261,7 +261,7 @@ if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
                     st.error(f"Error: {runs[0].get('error', 'Unknown error')}")
     
     with tab4:
-        st.subheader("🏆 Final Verdict")
+        st.subheader("Final Verdict")
         
         st.markdown("""
         ### Overall Recommendations
@@ -273,13 +273,13 @@ if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
         
         with col1:
             st.markdown("""
-            #### ✅ Choose LangSmith if:
+            #### Choose LangSmith if:
             - You're building with LangChain exclusively
             - You want zero-setup observability
             - You prioritize developer experience
             - You don't need self-hosting
             
-            #### ✅ Choose Langfuse if:
+            #### Choose Langfuse if:
             - You need self-hosting capability
             - You use multiple LLM frameworks
             - You want to avoid vendor lock-in
@@ -288,13 +288,13 @@ if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
         
         with col2:
             st.markdown("""
-            #### ✅ Choose Braintrust if:
+            #### Choose Braintrust if:
             - Evaluation is your primary focus
             - You need advanced A/B testing
             - You're doing research/benchmarking
             - You have custom LLM implementations
             
-            #### 🎯 My Personal Choice:
+            #### My Personal Choice:
             **Langfuse** for production systems due to:
             - Open source nature (no lock-in)
             - Self-hosting flexibility
@@ -320,27 +320,6 @@ if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
         """)
 
 else:
-    st.info("👆 Configure your test parameters above and click 'Run Benchmark' to start")
+    st.info("Configure your test parameters above and click 'Run Benchmark' to start")
 
 st.divider()
-
-st.markdown("""
-### 📚 Quick Start Guide
-
-1. **Setup Environment Variables**: Copy `.env.example` to `.env` and add your API keys
-2. **Install Dependencies**: `pip install -r requirements.txt`
-3. **Run Benchmark**: `streamlit run benchmark.py`
-
-### 🔑 Required API Keys
-
-- **OpenAI**: Get from https://platform.openai.com/api-keys
-- **LangSmith**: Get from https://smith.langchain.com/settings
-- **Langfuse**: Get from https://cloud.langfuse.com or self-hosted instance
-- **Braintrust**: Get from https://www.braintrust.dev/app/settings
-
-### 📖 Documentation
-
-- [LangSmith Docs](https://docs.smith.langchain.com/)
-- [Langfuse Docs](https://langfuse.com/docs)
-- [Braintrust Docs](https://www.braintrust.dev/docs)
-""")
