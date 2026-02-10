@@ -2,10 +2,9 @@ import os
 import time
 from typing import Dict, Any, List
 from langchain_openai import ChatOpenAI
-from langchain.agents import AgentExecutor
-from langchain.agents import create_openai_tools_agent
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain.tools import tool
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langsmith import Client
 
 
@@ -44,17 +43,18 @@ class LangSmithAgent:
 
         self.tools = [get_billing_info, get_technical_support, get_general_info]
         
+        # Updated prompt with MessagesPlaceholder for agent_scratchpad
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", "You are a helpful customer service agent."),
             ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
         
         # 2. Specify the model explicitly
         self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=self.api_key)
         
-        # 3. Create the agent
-        agent = create_openai_tools_agent(self.llm, self.tools, self.prompt)
+        # 3. Create the agent using create_tool_calling_agent
+        agent = create_tool_calling_agent(self.llm, self.tools, self.prompt)
         
         if agent is None:
             raise ValueError("Failed to create LangChain agent. Check prompt and tool definitions.")

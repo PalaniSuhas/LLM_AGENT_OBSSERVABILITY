@@ -55,7 +55,7 @@ with col2:
 
 st.divider()
 
-if st.button("🚀 Run Benchmark", type="primary", use_container_width=True):
+if st.button("🚀 Run Benchmark", type="primary", width='stretch'):
     
     results = {
         "LangSmith": [],
@@ -146,7 +146,7 @@ if st.button("🚀 Run Benchmark", type="primary", use_container_width=True):
                     text="Avg Agent Latency (ms)"
                 )
                 fig_latency.update_traces(texttemplate='%{text:.2f}ms', textposition='outside')
-                st.plotly_chart(fig_latency, use_container_width=True)
+                st.plotly_chart(fig_latency, width='stretch')
             
             with col2:
                 fig_total = px.bar(
@@ -158,9 +158,9 @@ if st.button("🚀 Run Benchmark", type="primary", use_container_width=True):
                     text="Avg Total Time (ms)"
                 )
                 fig_total.update_traces(texttemplate='%{text:.2f}ms', textposition='outside')
-                st.plotly_chart(fig_total, use_container_width=True)
+                st.plotly_chart(fig_total, width='stretch')
             
-            st.dataframe(perf_df, use_container_width=True)
+            st.dataframe(perf_df, width='stretch')
     
     with tab2:
         st.subheader("Feature Comparison Matrix")
@@ -209,7 +209,7 @@ if st.button("🚀 Run Benchmark", type="primary", use_container_width=True):
         }
         
         comparison_df = pd.DataFrame(comparison_data)
-        st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+        st.dataframe(comparison_df, width='stretch', hide_index=True)
         
         st.divider()
         
