@@ -2,3 +2,6 @@ LLM_AGENT/
 .env
 __pycache__
 agents/__pycache__
+*.bin
+index_metadata.json
+*.pdf

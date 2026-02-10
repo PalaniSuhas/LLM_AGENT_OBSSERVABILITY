@@ -2,7 +2,7 @@
 python-dotenv
 streamlit
 
-# LLM and LangChain - compatible versions
+# LLM and LangChain
 openai
 langchain
 langchain-openai
@@ -15,6 +15,14 @@ langfuse
 braintrust
 autoevals
 
+# Vector store and embeddings
+faiss-cpu
+# For GPU support, use: faiss-gpu
+
+# PDF processing
+PyPDF2
+
 # Utilities
 pandas
 plotly
+numpy
