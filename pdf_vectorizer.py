@@ -12,7 +12,6 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain.schema import HumanMessage, SystemMessage
 
-# 18 Research Questions about Health Insurance Markets
 RESEARCH_QUESTIONS = [
     "What does the report mean by 'market power' in health insurance, and why is it harmful in both input and output markets?",
     "What is the Herfindahl-Hirschman Index (HHI), and how has market concentration in health insurance changed between 2014 and 2024?",
@@ -66,7 +65,6 @@ class PDFVectorAnalyzer:
         
         print(f"Loaded {len(self.documents)} pages")
         
-        # Split into chunks
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap,
@@ -97,10 +95,8 @@ class PDFVectorAnalyzer:
         if not self.vectorstore:
             raise ValueError("No vector store to save. Build index first.")
         
-        # Save FAISS index
         self.vectorstore.save_local(index_path)
         
-        # Save metadata
         metadata = {
             "pdf_path": self.pdf_path,
             "chunk_size": self.chunk_size,
@@ -125,7 +121,6 @@ class PDFVectorAnalyzer:
             allow_dangerous_deserialization=True
         )
         
-        # Load metadata
         with open(metadata_path, 'r') as f:
             metadata = json.load(f)
         
@@ -138,10 +133,7 @@ class PDFVectorAnalyzer:
         if not self.vectorstore:
             raise ValueError("No vector store loaded. Build or load index first.")
         
-        # Retrieve relevant documents
         docs = self.vectorstore.similarity_search(question, k=top_k)
-        
-        # Extract text content
         contexts = [doc.page_content for doc in docs]
         
         return contexts
@@ -161,13 +153,9 @@ class PDFVectorAnalyzer:
         Returns:
             Generated answer based on PDF context
         """
-        # Retrieve relevant context
         contexts = self.retrieve_context(question, top_k=top_k)
-        
-        # Combine contexts
         combined_context = "\n\n---\n\n".join(contexts)
         
-        # Create prompt
         system_prompt = """You are an expert analyst studying health insurance market competition.
 
 You will be provided with:
@@ -193,7 +181,6 @@ Guidelines:
 
 **Your Answer:**"""
 
-        # Generate answer
         messages = [
             SystemMessage(content=system_prompt),
             HumanMessage(content=user_prompt)
@@ -230,21 +217,17 @@ Guidelines:
         return analyses
 
 
-# Example usage
 if __name__ == "__main__":
-    # Initialize analyzer
     analyzer = PDFVectorAnalyzer(
         "competition-health-insurance-us-markets.pdf",
         chunk_size=1000,
         chunk_overlap=200
     )
     
-    # Load and index PDF
     analyzer.load_and_split_pdf()
     analyzer.build_vector_index()
     analyzer.save_index("faiss_index.bin", "index_metadata.json")
     
-    # Answer a single question
     answer = analyzer.answer_single_question(RESEARCH_QUESTIONS[0])
     print(f"\nQuestion: {RESEARCH_QUESTIONS[0]}")
     print(f"\nAnswer: {answer}")

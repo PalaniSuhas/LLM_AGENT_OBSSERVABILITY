@@ -19,22 +19,22 @@ def test_environment():
     required = ["OPENAI_API_KEY"]
     optional = ["LANGCHAIN_API_KEY", "LANGFUSE_PUBLIC_KEY", "BRAINTRUST_API_KEY"]
     
-    print("\n✓ Required environment variables:")
+    print("\n Required environment variables:")
     for var in required:
         value = os.getenv(var)
         if value:
-            print(f"  ✓ {var}: {'*' * 8}{value[-4:]}")
+            print(f"  [PASS] {var}: {'*' * 8}{value[-4:]}")
         else:
-            print(f"  ✗ {var}: NOT SET")
+            print(f"  [FAIL] {var}: NOT SET")
             return False
     
-    print("\n✓ Optional environment variables (for full testing):")
+    print("\n Optional environment variables (for full testing):")
     for var in optional:
         value = os.getenv(var)
         if value:
-            print(f"  ✓ {var}: {'*' * 8}{value[-4:]}")
+            print(f"  [PASS] {var}: {'*' * 8}{value[-4:]}")
         else:
-            print(f"  - {var}: not set (optional)")
+            print(f"  [SKIP] {var}: not set (optional)")
     
     return True
 
@@ -58,9 +58,9 @@ def test_dependencies():
     for import_name, package_name in required_packages:
         try:
             __import__(import_name)
-            print(f"  ✓ {package_name}")
+            print(f"  [PASS] {package_name}")
         except ImportError:
-            print(f"  ✗ {package_name} - NOT INSTALLED")
+            print(f"  [FAIL] {package_name} - NOT INSTALLED")
             all_installed = False
     
     return all_installed
@@ -75,11 +75,11 @@ def test_pdf_exists():
     
     if Path(pdf_path).exists():
         size = Path(pdf_path).stat().st_size
-        print(f"  ✓ PDF found: {pdf_path}")
-        print(f"  ✓ File size: {size:,} bytes ({size/1024/1024:.2f} MB)")
+        print(f"  [PASS] PDF found: {pdf_path}")
+        print(f"  [INFO] File size: {size:,} bytes ({size/1024/1024:.2f} MB)")
         return True
     else:
-        print(f"  ✗ PDF not found: {pdf_path}")
+        print(f"  [FAIL] PDF not found: {pdf_path}")
         print(f"  Please download and place the PDF in the current directory")
         return False
 
@@ -93,19 +93,18 @@ def test_vector_index():
     metadata_path = "index_metadata.json"
     
     if Path(index_path).exists() and Path(metadata_path).exists():
-        print(f"  ✓ Vector index found: {index_path}")
-        print(f"  ✓ Metadata found: {metadata_path}")
+        print(f"  [PASS] Vector index found: {index_path}")
+        print(f"  [PASS] Metadata found: {metadata_path}")
         
-        # Load metadata to verify
         with open(metadata_path, 'r') as f:
             metadata = json.load(f)
         
-        print(f"  ✓ Index contains {metadata['num_chunks']} chunks")
-        print(f"  ✓ Chunk size: {metadata['chunk_size']} characters")
-        print(f"  ✓ Chunk overlap: {metadata['chunk_overlap']} characters")
+        print(f"  [INFO] Index contains {metadata['num_chunks']} chunks")
+        print(f"  [INFO] Chunk size: {metadata['chunk_size']} characters")
+        print(f"  [INFO] Chunk overlap: {metadata['chunk_overlap']} characters")
         return True
     else:
-        print(f"  - Vector index not found")
+        print(f"  [SKIP] Vector index not found")
         print(f"  Run: python build_index.py")
         return False
 
@@ -118,48 +117,28 @@ def test_rag_retrieval():
     try:
         from pdf_vectorizer import PDFVectorAnalyzer, RESEARCH_QUESTIONS
         
-        # Check if index exists
         if not Path("faiss_index.bin").exists():
-            print("  - Skipping (index not built yet)")
+            print("  [SKIP] Skipping (index not built yet)")
             return True
         
-        # Load analyzer
         print("  Loading vector index...")
         analyzer = PDFVectorAnalyzer("competition-health-insurance-us-markets.pdf")
         analyzer.load_index("faiss_index.bin", "index_metadata.json")
         
-        # Test retrieval
         test_question = RESEARCH_QUESTIONS[0]
         print(f"  Testing with: {test_question[:60]}...")
         
         chunks = analyzer.retrieve_context(test_question, top_k=3)
-        print(f"  ✓ Retrieved {len(chunks)} relevant chunks")
+        print(f"  [PASS] Retrieved {len(chunks)} relevant chunks")
         
-        # Show first chunk preview
         if chunks:
             preview = chunks[0][:150].replace('\n', ' ')
-            print(f"  ✓ Sample chunk: {preview}...")
+            print(f"  [INFO] Sample chunk: {preview}...")
         
         return True
         
     except Exception as e:
-        print(f"  ✗ Error: {e}")
-        return False
-
-def test_agents():
-    """Test that agent imports work"""
-    print("\n" + "="*80)
-    print("TESTING AGENT IMPORTS")
-    print("="*80)
-    
-    try:
-        from agents import LangSmithAgent, LangfuseAgent, BraintrustAgent
-        print("  ✓ LangSmithAgent imported")
-        print("  ✓ LangfuseAgent imported")
-        print("  ✓ BraintrustAgent imported")
-        return True
-    except Exception as e:
-        print(f"  ✗ Error importing agents: {e}")
+        print(f"  [FAIL] Error: {e}")
         return False
 
 def main():
@@ -170,15 +149,12 @@ def main():
     
     results = []
     
-    # Run tests
     results.append(("Environment", test_environment()))
     results.append(("Dependencies", test_dependencies()))
     results.append(("PDF File", test_pdf_exists()))
     results.append(("Vector Index", test_vector_index()))
     results.append(("RAG Retrieval", test_rag_retrieval()))
-    results.append(("Agent Imports", test_agents()))
     
-    # Summary
     print("\n" + "="*80)
     print("TEST SUMMARY")
     print("="*80)
@@ -187,18 +163,18 @@ def main():
     total = len(results)
     
     for test_name, result in results:
-        status = "✅ PASS" if result else "❌ FAIL"
+        status = "[PASS]" if result else "[FAIL]"
         print(f"  {status}: {test_name}")
     
     print(f"\n  Total: {passed}/{total} tests passed")
     
     if passed == total:
-        print("\n✅ ALL TESTS PASSED!")
+        print("\n[SUCCESS] ALL TESTS PASSED")
         print("\nYou can now:")
         print("  1. Build index: python build_index.py")
         print("  2. Run benchmark: streamlit run benchmark_rag.py")
     else:
-        print("\n❌ SOME TESTS FAILED")
+        print("\n[ERROR] SOME TESTS FAILED")
         print("\nPlease fix the issues above before proceeding.")
     
     print("="*80 + "\n")

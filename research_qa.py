@@ -9,7 +9,6 @@ from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Import RAG analyzer and research questions
 from pdf_vectorizer import PDFVectorAnalyzer, RESEARCH_QUESTIONS
 
 load_dotenv()
@@ -20,7 +19,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Configuration
 PDF_PATH = "competition-health-insurance-us-markets.pdf"
 INDEX_PATH = "faiss_index.bin"
 METADATA_PATH = "index_metadata.json"
@@ -30,19 +28,16 @@ st.markdown("**Answer 18 research questions using RAG from the health insurance 
 
 st.divider()
 
-# Sidebar: RAG Configuration
 with st.sidebar:
     st.header("RAG Configuration")
     
-    # Check if PDF exists
     pdf_exists = Path(PDF_PATH).exists()
     index_exists = Path(INDEX_PATH).exists()
     
     if pdf_exists:
-        st.success(f"PDF found: {PDF_PATH}")
+        st.success(f"PDF found")
     else:
-        st.error(f"PDF not found: {PDF_PATH}")
-        st.info("Place the PDF in the same directory as this script")
+        st.error(f"PDF not found")
     
     if index_exists:
         st.success("Vector index found")
@@ -59,8 +54,7 @@ with st.sidebar:
         "Context chunks per question",
         min_value=3,
         max_value=15,
-        value=8,
-        help="Number of PDF chunks to retrieve for each question. More chunks = more context but slower."
+        value=8
     )
     
     chunk_size = st.number_input(
@@ -68,8 +62,7 @@ with st.sidebar:
         min_value=500,
         max_value=2000,
         value=1000,
-        step=100,
-        help="Size of each text chunk from the PDF"
+        step=100
     )
     
     chunk_overlap = st.number_input(
@@ -77,8 +70,7 @@ with st.sidebar:
         min_value=50,
         max_value=500,
         value=200,
-        step=50,
-        help="Overlap between chunks to maintain context"
+        step=50
     )
     
     st.divider()
@@ -90,7 +82,6 @@ with st.sidebar:
     **Method:** FAISS + OpenAI Embeddings  
     """)
 
-# Build/Rebuild Index if requested
 if rebuild_index and pdf_exists:
     with st.spinner("Building vector index from PDF..."):
         analyzer = PDFVectorAnalyzer(
@@ -101,10 +92,9 @@ if rebuild_index and pdf_exists:
         analyzer.load_and_split_pdf()
         analyzer.build_vector_index()
         analyzer.save_index(INDEX_PATH, METADATA_PATH)
-        st.success("Vector index built successfully!")
+        st.success("Vector index built successfully")
         st.rerun()
 
-# Main content
 st.subheader("Research Questions")
 
 with st.expander("View All 18 Research Questions", expanded=False):
@@ -113,33 +103,28 @@ with st.expander("View All 18 Research Questions", expanded=False):
 
 st.divider()
 
-# Answer Questions Button
-if st.button("Answer All Questions with RAG", type="primary", use_container_width=True):
+if st.button("Answer All Questions with RAG", type="primary", width='stretch'):
     
     if not index_exists:
-        st.error("Vector index not found! Please build the index first using the sidebar.")
+        st.error("Vector index not found. Please build the index first.")
     elif not pdf_exists:
-        st.error("PDF not found! Please add the PDF file to the directory.")
+        st.error("PDF not found. Please add the PDF file to the directory.")
     else:
-        # Initialize progress tracking
         progress_bar = st.progress(0)
         status_text = st.empty()
         
         with st.spinner("Loading vector index..."):
-            # Load RAG analyzer
             rag_analyzer = PDFVectorAnalyzer(PDF_PATH)
             rag_analyzer.load_index(INDEX_PATH, METADATA_PATH)
         
         st.success("Vector index loaded")
         
-        # Answer all questions
         analyses = {}
         
         for i, question in enumerate(RESEARCH_QUESTIONS, 1):
             status_text.text(f"Answering question {i}/{len(RESEARCH_QUESTIONS)}...")
             progress_bar.progress(i / len(RESEARCH_QUESTIONS))
             
-            # Get answer with RAG
             answer = rag_analyzer.answer_single_question(
                 question,
                 top_k=top_k
@@ -150,7 +135,6 @@ if st.button("Answer All Questions with RAG", type="primary", use_container_widt
         progress_bar.empty()
         status_text.empty()
         
-        # Save results
         results_data = {
             "timestamp": datetime.now().isoformat(),
             "configuration": {
@@ -167,9 +151,8 @@ if st.button("Answer All Questions with RAG", type="primary", use_container_widt
         with open(output_filename, "w") as f:
             json.dump(results_data, f, indent=2)
         
-        st.success(f"All questions answered! Results saved to {output_filename}")
+        st.success(f"All questions answered. Results saved to {output_filename}")
         
-        # Display results in tabs
         tab1, tab2, tab3 = st.tabs([
             "All Q&A Pairs",
             "Detailed View",
@@ -190,7 +173,6 @@ if st.button("Answer All Questions with RAG", type="primary", use_container_widt
         with tab2:
             st.subheader("Detailed Question View")
             
-            # Select a question to view in detail
             question_options = [f"Q{i}: {q[:80]}..." for i, q in enumerate(RESEARCH_QUESTIONS, 1)]
             selected_idx = st.selectbox(
                 "Select a question to view:",
@@ -207,10 +189,8 @@ if st.button("Answer All Questions with RAG", type="primary", use_container_widt
             st.markdown("### Answer")
             st.markdown(selected_answer)
             
-            # Show retrieved context
             if st.checkbox("Show retrieved PDF chunks"):
                 with st.spinner("Retrieving context chunks..."):
-                    # Get the actual chunks used
                     chunks = rag_analyzer.retrieve_context(selected_question, top_k=top_k)
                     
                     st.markdown(f"**{len(chunks)} relevant chunks retrieved:**")
@@ -224,17 +204,15 @@ if st.button("Answer All Questions with RAG", type="primary", use_container_widt
             col1, col2 = st.columns(2)
             
             with col1:
-                # JSON export
                 st.download_button(
                     label="Download Complete Results (JSON)",
                     data=json.dumps(results_data, indent=2),
                     file_name=output_filename,
                     mime="application/json",
-                    use_container_width=True
+                    width='stretch'
                 )
             
             with col2:
-                # Markdown export
                 markdown_content = f"# Health Insurance Market Research Q&A\n\n"
                 markdown_content += f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
                 markdown_content += f"**Source:** {PDF_PATH}\n\n"
@@ -251,7 +229,7 @@ if st.button("Answer All Questions with RAG", type="primary", use_container_widt
                     data=markdown_content,
                     file_name=f"research_qa_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                     mime="text/markdown",
-                    use_container_width=True
+                    width='stretch'
                 )
             
             st.subheader("Results Preview")
@@ -277,7 +255,7 @@ else:
     **3. Pure RAG**
     - No hardcoded answers
     - All responses are generated from actual PDF content
-    - Adjust `top_k` in sidebar to control context size
+    - Adjust top_k in sidebar to control context size
     
     **Why RAG?**
     - Ensures answers are factual and sourced from the document
@@ -286,4 +264,4 @@ else:
     """)
 
 st.divider()
-st.caption("Powered by FAISS + OpenAI | RAG-based PDF Q&A System")
+st.caption("Powered by FAISS + OpenAI")
