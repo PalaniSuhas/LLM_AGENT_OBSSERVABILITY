@@ -1,6 +1,6 @@
 """
 Updated Benchmark Script with RAG-based Analysis
-Integrates PDF vectorization to avoid caching issues
+Properly separates agent testing from RAG analysis
 """
 import streamlit as st
 import os
@@ -15,8 +15,8 @@ from pathlib import Path
 # Import agents
 from agents import LangSmithAgent, LangfuseAgent, BraintrustAgent
 
-# Import RAG analyzer
-from pdf_vectorizer import PDFVectorAnalyzer, RESEARCH_QUESTIONS
+# Import RAG analyzer and both question sets
+from pdf_vectorizer import PDFVectorAnalyzer, RESEARCH_QUESTIONS, AGENT_TEST_QUESTIONS
 
 load_dotenv()
 
@@ -31,7 +31,7 @@ INDEX_PATH = "faiss_index.bin"
 METADATA_PATH = "index_metadata.json"
 
 st.title("LLM Agent Observability Tools Benchmark")
-st.markdown("**RAG-Powered Analysis: Fresh context from health insurance market research PDF**")
+st.markdown("**Two-Stage Process: (1) Test agents with customer service questions → (2) Analyze results using RAG with health insurance research**")
 
 st.divider()
 
@@ -93,7 +93,7 @@ if rebuild_index and pdf_exists:
         analyzer.load_and_split_pdf()
         analyzer.build_vector_index()
         analyzer.save_index(INDEX_PATH, METADATA_PATH)
-        st.success(" Vector index built successfully!")
+        st.success("✅ Vector index built successfully!")
         st.rerun()
 
 # Main content
@@ -113,26 +113,34 @@ num_runs = st.number_input(
     help="Run each question multiple times to average latency"
 )
 
-# Use research questions automatically
-questions = RESEARCH_QUESTIONS
-
-st.info(f"Testing with {len(RESEARCH_QUESTIONS)} research questions across {len(tools_to_test)} tools with {num_runs} run(s) each")
-st.info(f"Total operations: {len(tools_to_test)} tools x {len(questions)} questions x {num_runs} runs = {len(tools_to_test) * len(questions) * num_runs}")
+# Use AGENT_TEST_QUESTIONS for benchmarking
+st.info(f"Testing with {len(AGENT_TEST_QUESTIONS)} agent test questions across {len(tools_to_test)} tools with {num_runs} run(s) each")
+st.info(f"Total operations: {len(tools_to_test)} tools x {len(AGENT_TEST_QUESTIONS)} questions x {num_runs} runs = {len(tools_to_test) * len(AGENT_TEST_QUESTIONS) * num_runs}")
 
 st.divider()
 
-# Research Questions Section
-with st.expander("View 18 Research Questions (for RAG analysis)", expanded=False):
-    st.markdown("These questions will be used to benchmark the agents and analyzed using context from the health insurance market research PDF:")
-    for i, q in enumerate(RESEARCH_QUESTIONS, 1):
-        st.markdown(f"**{i}.** {q}")
+# Show both question sets
+col1, col2 = st.columns(2)
+
+with col1:
+    with st.expander("📝 Agent Test Questions (for benchmarking)", expanded=False):
+        st.markdown("**These questions test the agents' customer service capabilities:**")
+        for i, q in enumerate(AGENT_TEST_QUESTIONS, 1):
+            st.markdown(f"**{i}.** {q}")
+
+with col2:
+    with st.expander("🔬 Research Questions (for RAG analysis)", expanded=False):
+        st.markdown("**These questions analyze benchmark results using PDF context:**")
+        for i, q in enumerate(RESEARCH_QUESTIONS[:5], 1):
+            st.markdown(f"**{i}.** {q}")
+        st.markdown(f"*...and {len(RESEARCH_QUESTIONS)-5} more questions*")
 
 st.divider()
 
 # Run Benchmark Button
 if st.button("Run Benchmark", type="primary", use_container_width=True):
     
-    if not questions:
+    if not AGENT_TEST_QUESTIONS:
         st.error("No questions available!")
     elif not index_exists:
         st.error("Vector index not found! Please build the index first using the sidebar.")
@@ -148,10 +156,11 @@ if st.button("Run Benchmark", type="primary", use_container_width=True):
         progress_bar = st.progress(0)
         status_text = st.empty()
         
-        total_operations = len(tools_to_test) * len(questions) * num_runs
+        total_operations = len(tools_to_test) * len(AGENT_TEST_QUESTIONS) * num_runs
         current_operation = 0
         
-        # Run benchmarks
+        # STAGE 1: Run agent benchmarks with customer service questions
+        st.header("Stage 1: Testing Agents")
         for tool_name in tools_to_test:
             st.subheader(f"Testing {tool_name}")
             
@@ -165,9 +174,9 @@ if st.button("Run Benchmark", type="primary", use_container_width=True):
                     agent = BraintrustAgent()
                 
                 # Test each question
-                for q_idx, question in enumerate(questions):
+                for q_idx, question in enumerate(AGENT_TEST_QUESTIONS):
                     for run_num in range(num_runs):
-                        status_text.text(f"Running {tool_name} - Question {q_idx + 1}/{len(questions)} - Run {run_num + 1}/{num_runs}")
+                        status_text.text(f"Running {tool_name} - Question {q_idx + 1}/{len(AGENT_TEST_QUESTIONS)} - Run {run_num + 1}/{num_runs}")
                         
                         start = time.time()
                         result = agent.run(question)
@@ -184,7 +193,7 @@ if st.button("Run Benchmark", type="primary", use_container_width=True):
                         
                         time.sleep(0.3)
                 
-                st.success(f"{tool_name} completed {len(questions)} questions x {num_runs} runs")
+                st.success(f"{tool_name} completed {len(AGENT_TEST_QUESTIONS)} questions x {num_runs} runs")
                 
             except Exception as e:
                 st.error(f"{tool_name} failed: {str(e)}")
@@ -198,7 +207,7 @@ if st.button("Run Benchmark", type="primary", use_container_width=True):
             "timestamp": datetime.now().isoformat(),
             "configuration": {
                 "tools_tested": tools_to_test,
-                "questions": questions,
+                "agent_questions": AGENT_TEST_QUESTIONS,
                 "num_runs": num_runs
             },
             "results": results
@@ -207,19 +216,19 @@ if st.button("Run Benchmark", type="primary", use_container_width=True):
         with open("results.json", "w") as f:
             json.dump(results_data, f, indent=2)
         
-        st.success("Results saved to results.json")
+        st.success("✅ Benchmark results saved to results.json")
         
-        # RAG-BASED ANALYSIS
+        # STAGE 2: RAG-BASED ANALYSIS
         st.divider()
-        st.header("RAG-Powered Analysis")
-        st.markdown("Analyzing benchmark results with fresh context from health insurance market research PDF")
+        st.header("Stage 2: RAG-Powered Analysis")
+        st.markdown("Analyzing benchmark results with context from health insurance market research PDF")
         
         with st.spinner("Loading vector index and generating analyses..."):
             # Load RAG analyzer
             rag_analyzer = PDFVectorAnalyzer(PDF_PATH)
             rag_analyzer.load_index(INDEX_PATH, METADATA_PATH)
             
-            # Analyze all research questions
+            # Analyze using RESEARCH_QUESTIONS
             analyses = rag_analyzer.analyze_all_questions(
                 RESEARCH_QUESTIONS,
                 results,
@@ -300,7 +309,7 @@ if st.button("Run Benchmark", type="primary", use_container_width=True):
             with open(full_analysis_path, 'w') as f:
                 json.dump(analyses, f, indent=2)
             
-            st.success(f"Full analysis saved to {full_analysis_path}")
+            st.success(f"✅ Full analysis saved to {full_analysis_path}")
             
             # Display all analyses
             for i, (question, analysis) in enumerate(analyses.items(), 1):
@@ -391,14 +400,22 @@ else:
     st.markdown("""
     ### How This Works:
     
-    1. **Agent Benchmarking**: Test LLM observability tools (LangSmith, Langfuse, Braintrust) with 18 research questions
-    2. **PDF Vectorization**: Health insurance market research PDF is chunked and embedded using FAISS
-    3. **RAG Analysis**: For each research question, retrieve relevant PDF context and analyze benchmark results
-    4. **Fresh Context**: Each analysis retrieves new context from the vector store to avoid caching
-    5. **18 Research Questions**: Comprehensive analysis covering market power, methodology, findings, and policy
+    **Stage 1: Agent Benchmarking**
+    - Test LLM observability tools (LangSmith, Langfuse, Braintrust)
+    - Use 5 simple customer service questions that agents can actually answer
+    - Measure latency, tool usage, and output quality
+    
+    **Stage 2: RAG Analysis**
+    - Health insurance market research PDF is chunked and embedded using FAISS
+    - For each of 18 research questions, retrieve relevant PDF context
+    - Analyze benchmark results in the context of market research principles
+    - Generate insights connecting tool performance to research findings
+    
+    **Key Separation:**
+    - **Agent test questions** → Simple customer service queries (billing, support, etc.)
+    - **Research questions** → Complex analysis questions about market concentration, HHI, policy implications
     
     **No hardcoded conclusions** - All insights are generated from actual benchmark data + PDF context.
     """)
 
 st.divider()
-st.caption("Powered by RAG | Fresh context on every run | No caching issues")
